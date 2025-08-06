@@ -1,40 +1,50 @@
-import { useState, useEffect } from "react";
-import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { Login } from "./components/Login";
 import { Register } from "./components/Register";
 import { Profile } from "./components/Profile";
 import { ProtectedRoute } from "./ProtectedRoute";
+import { PublicRoute } from "./PublicRoute";
+import { AuthProvider } from "./context/AuthContext";
+import Home from "./components/Home";
 
 const App = () => {
-  const [token, setToken] = useState(() => localStorage.getItem("token") || "");
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  useEffect(() => {
-    if (token) {
-      localStorage.setItem("token", token);
-
-      if (location.pathname === "/login" || location.pathname === "/") {
-        navigate("/profile");
-      }
-    }
-  }, [token, navigate, location.pathname]);
-
   return (
-    <div>
+    <AuthProvider>
       <Routes>
-        <Route path="/login" element={<Login onToken={setToken} />} />
-        <Route path="/register" element={<Register />} />
+        <Route
+          path=""
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <PublicRoute>
+              <Register />
+            </PublicRoute>
+          }
+        />
         <Route
           path="/profile"
           element={
             <ProtectedRoute>
-              <Profile token={token} />
+              <Profile />
             </ProtectedRoute>
           }
         />
       </Routes>
-    </div>
+    </AuthProvider>
   );
 };
 

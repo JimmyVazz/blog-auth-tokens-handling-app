@@ -1,8 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-export const Login = ({ onToken }: { onToken: (token: string) => void }) => {
+export const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const { checkAuth } = useAuth();
 
   const handleLogin = async () => {
     const res = await fetch("http://localhost:8000/api/auth/login", {
@@ -11,14 +15,15 @@ export const Login = ({ onToken }: { onToken: (token: string) => void }) => {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({ email, password }),
     });
 
-    const data = await res.json();
-    console.log("Login response:", data);
-
-    if (data?.accessToken) {
-      onToken(data.accessToken);
+    if (res.status === 200) {
+      await checkAuth();
+      navigate("/profile");
+    } else {
+      alert("Invalid credentials");
     }
   };
 
@@ -36,7 +41,7 @@ export const Login = ({ onToken }: { onToken: (token: string) => void }) => {
         type="password"
         placeholder="Password"
       />
-      <button disabled={email === "" || password === ""} onClick={handleLogin}>
+      <button disabled={!email || !password} onClick={handleLogin}>
         Login
       </button>
     </div>

@@ -13,6 +13,7 @@ export const Register = () => {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({ email, password }),
     });
 
@@ -20,7 +21,7 @@ export const Register = () => {
       navigate("/login");
     } else {
       const data = await res.json();
-      console.error("Error al registrar:", data.message || "Algo salió mal");
+      alert(data.message || "Something went wrong");
     }
   };
 
@@ -38,10 +39,7 @@ export const Register = () => {
         type="password"
         placeholder="Password"
       />
-      <button
-        disabled={email === "" || password === ""}
-        onClick={handleRegister}
-      >
+      <button disabled={!email || !password} onClick={handleRegister}>
         Register
       </button>
     </div>
